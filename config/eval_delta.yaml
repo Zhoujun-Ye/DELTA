@@ -1,0 +1,35 @@
+run:
+  task: 'MultiDatasetEvaluateTaskWithCustomModel'
+  seed: 2024
+  output_dir: &output_dir './result/delta'
+  base_config:
+    batch_size: 256
+    dataloader_num_workers: 8
+    dataloader_pin_memory: True
+    dataloader_persistent_workers: True
+    dataloader_prefetch_factor: 2
+    use_feature_getters_for_similarity: True
+    collator:
+      collator_cls: 'ImageCollator'
+      config:
+        max_length: 77
+    output_dir: *output_dir
+
+model:
+  model_cls: 'DELTAModel'
+  config:
+    pretrained_model_name_or_path: './output/delta'
+
+processor:
+  processor_cls: "CLIPProcessor"
+  config:
+    pretrained_model_name_or_path: 'openai/clip-vit-base-patch32'
+
+evaluator:
+  - "CrepeEvaluator"
+  - "ValseEvaluator"
+  - "SugarCrepeEvaluator"
+  - "SugarCrepePPEvaluator"
+  - "AROCOCOOrderEvaluator"
+  - "AROFlickrOrderEvaluator"
+  - "ColorSwapEvaluator"

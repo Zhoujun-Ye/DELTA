@@ -1,0 +1,69 @@
+run:
+  task: 'DatasetTrainTaskWithCustomModel'
+  runner: 'DELTATrainer'
+  seed: 2025
+
+collator:
+  collator_cls: 'COCOImageCollator'
+  config:
+    use_negative_caption: True
+    num_hard_negs: 3
+
+model:
+  model_cls: 'DELTAModel'
+  config_cls: 'DELTAConfig'
+  config:
+    pretrained_model_name_or_path: &pretrained_model_name_or_path 'openai/clip-vit-base-patch32'
+    text_binding:
+      enabled: True
+      layer_indices: [6, 7, 8]
+      num_buckets: 24
+      max_distance: 24
+      fused_readout_enabled: True
+      fused_readout_gate_bias_init: -2.0
+      loss_weight: 1.0
+      loss_temperature: 3.0
+      loss_detach_image: False
+      loss_enabled: True
+    vision_binding:
+      enabled: True
+      loss_weight: 1.0
+      loss_temperature: 5.0
+      loss_detach_text: True
+      object_attention_temperature: 0.07
+      attribute_attention_temperature: 0.07
+      object_prior_gamma: 1.0
+
+processor:
+  processor_cls: "CLIPProcessor"
+  config:
+    pretrained_model_name_or_path: 'openai/clip-vit-base-patch32'
+
+dataset:
+  COCOCaptionsWithImageDatasetBuilder:
+    split: 'train'
+
+trainer:
+  output_dir: './output/delta'
+  learning_rate: &learning_rate 1.0e-5
+  lr_scheduler_type: 'cosine'
+  warmup_steps: &warmup_steps 50
+  weight_decay: &weight_decay 1.0e-1
+  num_train_epochs : &num_train_epoch 5
+  save_strategy: 'epoch'
+  logging_steps : 10
+  eval_strategy: 'no' # 'steps', 'epochs', 'no'
+  save_total_limit: 1
+  per_device_train_batch_size : &per_device_batch_size 256
+  gradient_accumulation_steps: &gradient_accumulation 1
+  gradient_checkpointing : False
+  gradient_checkpointing_kwargs:
+    use_reentrant: False
+  ddp_find_unused_parameters: False
+  group_by_length : False # Whether to order the sample by token length.
+  use_cpu : False
+  remove_unused_columns : False
+  fp16: &fp16 False # use torch.float16
+  bf16: &bf16 True # Use torch.bfloat16
+  dataloader_num_workers: 8
+  dataloader_pin_memory: True

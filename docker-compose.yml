@@ -1,0 +1,25 @@
+services:
+  delta:
+    build: .
+    image: delta
+    container_name: delta
+    shm_size: '16g'
+    gpus: all
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./dataset:/app/dataset
+      - ./output:/app/output
+      - ./logs:/app/logs
+    environment:
+      - HF_HOME=/app/dataset
+      - HF_DATASETS_CACHE=/app/dataset
+      - DATASET_BASE_DIR=/app/dataset
+      - HF_HUB_DISABLE_XET=1
+      - HF_HUB_ENABLE_HF_TRANSFER=0
+      - TOKENIZERS_PARALLELISM=false
+      - LOG_DIR=/app/logs
+    tty: true
+    stdin_open: true
+    command: bash 
