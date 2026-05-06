@@ -161,7 +161,3 @@ To run training followed by evaluation:
 ```bash
 CUDA_VISIBLE_DEVICES=0 bash scripts/train_eval.sh
 ```
-
-## Anonymity Notes
-
-This repository is prepared for anonymous review. The README intentionally omits author names, affiliations, email addresses, personal paths, and external code-release URLs. Keep local artifacts such as `dataset/`, `data/`, `logs/`, `output/`, and `result/` out of commits.
